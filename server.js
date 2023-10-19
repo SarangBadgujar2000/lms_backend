@@ -3,6 +3,9 @@ const dotenv=require("dotenv").config()
 const mongoConnection=require("./connection")
 const cors=require("cors");
 const router = require("./routes/routes");
+var session = require('express-session')
+var passport = require('passport');
+const { initializePassport } = require("./passportConfig");
 
 const app=express();
 mongoConnection(process.env.URI)
@@ -10,6 +13,16 @@ app.use(cors())
 
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
+initializePassport(passport)
+app.use(session({
+    secret: 'keyboard cat',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false }
+}))
+
+app.use(passport.initialize())
+app.use(passport.session())
 
 app.get('/',(req,res)=>{
     res.send("Hello ji")
